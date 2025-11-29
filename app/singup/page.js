@@ -17,6 +17,10 @@ const page = () => {
   const { user, loading: authLoading } = useAuth();
 
   const [correo, setCorreo] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [usrname, setUsrname] = useState("");
+  const [semestre, setSemestre] = useState("");
+  const [carrera, setCarrera] = useState("");
   const [passwd, setPasswd] = useState("");
   const [error, setError] = useState("");
   const [loading, setloading] = useState(false);
@@ -59,6 +63,46 @@ const page = () => {
       <div>
         <form className={styles.formulario}>
           <h2>Crea tu cuenta</h2>
+          <div className={styles.field}>
+            <label htmlFor="nombre">Nombre completo</label>
+            <input
+              id="nombre"
+              type="text"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            ></input>
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="usrname">Nombre de usuario</label>
+            <input
+              id="usrname"
+              type="text"
+              value={usrname}
+              onChange={(e) => setUsrname(e.target.value)}
+              required
+            ></input>
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="carrera">Carrera</label>
+            <input
+              id="carrera"
+              type="text"
+              value={carrera}
+              onChange={(e) => setCarrera(e.target.value)}
+              required
+            ></input>
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="semestre">Semestre</label>
+            <input
+              id="semestre"
+              type="text"
+              value={semestre}
+              onChange={(e) => setSemestre(e.target.value)}
+              required
+            ></input>
+          </div>
           <div className={styles.field}>
             <label htmlFor="correo">Correo electronico</label>
             <input
