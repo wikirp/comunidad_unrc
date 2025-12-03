@@ -41,6 +41,6 @@ const NoticiasDeNosotrosProntoPage = () => {
 };
 
 export default NoticiasDeNosotrosProntoPage;
-*** End Patch```} />
+
 
 
