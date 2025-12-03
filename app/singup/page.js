@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  inMemoryPersistence,
   setPersistence,
-  signInWithPopup,
+  createUserWithEmailAndPassword,
+  browserLocalPersistence
 } from "firebase/auth";
-import { auth, googleProvider } from "@/configs/firebaseConf";
+import { auth } from "@/configs/firebaseConf";
 import { useAuth } from "@/hooks/useAuth";
 
 import styles from "./singup.module.scss";
@@ -14,7 +14,7 @@ import Link from "next/link";
 
 const page = () => {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, userData, loadingUserData } = useAuth();
 
   const [correo, setCorreo] = useState("");
   const [nombre, setNombre] = useState("");
@@ -22,16 +22,22 @@ const page = () => {
   const [semestre, setSemestre] = useState("");
   const [carrera, setCarrera] = useState("");
   const [passwd, setPasswd] = useState("");
+  const [confirmPasswd, setConfirmPasswd] = useState("");
   const [error, setError] = useState("");
   const [loading, setloading] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && user) {
-      router.push("/panel");
+    if (!authLoading && user && userData) {
+      // Redirigir según el valor de firstTime
+      if (userData.firstTime === true) {
+        router.push("/completar-perfil");
+      } else {
+        router.push("/panel");
+      }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, userData, router]);
 
-  if (authLoading || user) {
+  if (authLoading || user || loadingUserData) {
     return (
       <div>
         <p>Cargando tu sesión...</p> {/* O un componente <Spinner /> */}
@@ -39,19 +45,50 @@ const page = () => {
     );
   }
 
-  const handleGoogleLogin = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError("");
-    setPersistence(auth, inMemoryPersistence)
-      .then(() => {
-        return signInWithPopup(auth, googleProvider);
-      })
-      .then(() => {
-        router.push("/");
-      })
-      .catch((error) => {
-        console.error(error);
-        setError(error.code);
-      });
+    setloading(true);
+
+    // Validar que las contraseñas coincidan
+    if (passwd !== confirmPasswd) {
+      setError("Las contraseñas no coinciden");
+      setloading(false);
+      return;
+    }
+
+    // Validar que la contraseña tenga al menos 6 caracteres
+    if (passwd.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      setloading(false);
+      return;
+    }
+
+    try {
+      await setPersistence(auth, browserLocalPersistence)
+      await createUserWithEmailAndPassword(auth, correo, passwd);
+      // La redirección se manejará automáticamente en el useEffect cuando userData esté disponible
+    } catch (error) {
+      console.error(error);
+      // Traducir errores comunes de Firebase
+      let errorMessage = "Error al crear la cuenta";
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "Este correo electrónico ya está en uso";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "El correo electrónico no es válido";
+          break;
+        case "auth/weak-password":
+          errorMessage = "La contraseña es muy débil";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setloading(false);
+    }
   };
 
   return (
@@ -61,56 +98,20 @@ const page = () => {
       </Link>
 
       <div>
-        <form className={styles.formulario}>
+        <form className={styles.formulario} onSubmit={handleSubmit}>
           <h2>Crea tu cuenta</h2>
-          <div className={styles.field}>
-            <label htmlFor="nombre">Nombre completo</label>
-            <input
-              id="nombre"
-              type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              required
-            ></input>
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="usrname">Nombre de usuario</label>
-            <input
-              id="usrname"
-              type="text"
-              value={usrname}
-              onChange={(e) => setUsrname(e.target.value)}
-              required
-            ></input>
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="carrera">Carrera</label>
-            <input
-              id="carrera"
-              type="text"
-              value={carrera}
-              onChange={(e) => setCarrera(e.target.value)}
-              required
-            ></input>
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="semestre">Semestre</label>
-            <input
-              id="semestre"
-              type="text"
-              value={semestre}
-              onChange={(e) => setSemestre(e.target.value)}
-              required
-            ></input>
-          </div>
+          
+          {error && <div className={styles.error}>{error}</div>}
+          
           <div className={styles.field}>
             <label htmlFor="correo">Correo electronico</label>
             <input
               id="correo"
-              type="mail"
+              type="email"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
               required
+              disabled={loading}
             ></input>
           </div>
           <div className={styles.field}>
@@ -121,20 +122,26 @@ const page = () => {
               value={passwd}
               onChange={(e) => setPasswd(e.target.value)}
               required
+              disabled={loading}
+              minLength={6}
             ></input>
           </div>
           <div className={styles.field}>
-            <label htmlFor="passwd">Repite tu contraseña</label>
+            <label htmlFor="confirmPasswd">Repite tu contraseña</label>
             <input
-              id="passwd"
+              id="confirmPasswd"
               type="password"
-              value={passwd}
-              onChange={(e) => setPasswd(e.target.value)}
+              value={confirmPasswd}
+              onChange={(e) => setConfirmPasswd(e.target.value)}
               required
+              disabled={loading}
+              minLength={6}
             ></input>
           </div>
 
-          <button type="submit">Iniciar sesión</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Creando cuenta..." : "Crear cuenta"}
+          </button>
         </form>
 
         <div className={styles.crea}>

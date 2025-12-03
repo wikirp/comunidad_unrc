@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import {
   inMemoryPersistence,
   setPersistence,
-  signInWithPopup,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/configs/firebaseConf";
+import { auth } from "@/configs/firebaseConf";
 import { useAuth } from "@/hooks/useAuth";
 
 import styles from "./login.module.scss";
@@ -14,7 +14,7 @@ import Link from "next/link";
 
 const page = () => {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, userData, loadingUserData } = useAuth();
 
   const [correo, setCorreo] = useState("");
   const [passwd, setPasswd] = useState("");
@@ -22,12 +22,17 @@ const page = () => {
   const [loading, setloading] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && user) {
-      router.push("/panel");
+    if (!authLoading && user && userData) {
+      // Redirigir según el valor de firstTime
+      if (userData.firstTime === true) {
+        router.push("/completar-perfil");
+      } else {
+        router.push("/panel");
+      }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, userData, router]);
 
-  if (authLoading || user) {
+  if (authLoading || user || loadingUserData) {
     return (
       <div>
         <p>Cargando tu sesión...</p> {/* O un componente <Spinner /> */}
@@ -35,19 +40,39 @@ const page = () => {
     );
   }
 
-  const handleGoogleLogin = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError("");
-    setPersistence(auth, inMemoryPersistence)
-      .then(() => {
-        return signInWithPopup(auth, googleProvider);
-      })
-      .then(() => {
-        router.push("/");
-      })
-      .catch((error) => {
-        console.error(error);
-        setError(error.code);
-      });
+    setloading(true);
+
+    try {
+      await setPersistence(auth, inMemoryPersistence);
+      await signInWithEmailAndPassword(auth, correo, passwd);
+      // La redirección se manejará automáticamente en el useEffect cuando userData esté disponible
+    } catch (error) {
+      console.error(error);
+      // Traducir errores comunes de Firebase
+      let errorMessage = "Error al iniciar sesión";
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "No existe una cuenta con este correo electrónico";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Contraseña incorrecta";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "El correo electrónico no es válido";
+          break;
+        case "auth/invalid-credential":
+          errorMessage = "Credenciales incorrectas";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setloading(false);
+    }
   };
 
   return (
@@ -57,16 +82,20 @@ const page = () => {
       </Link>
 
       <div>
-        <form className={styles.formulario}>
+        <form className={styles.formulario} onSubmit={handleSubmit}>
           <h2>Inicia sesion</h2>
+          
+          {error && <div className={styles.error}>{error}</div>}
+          
           <div className={styles.field}>
             <label htmlFor="correo">Correo electronico</label>
             <input
               id="correo"
-              type="mail"
+              type="email"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
               required
+              disabled={loading}
             ></input>
           </div>
           <div className={styles.field}>
@@ -77,10 +106,13 @@ const page = () => {
               value={passwd}
               onChange={(e) => setPasswd(e.target.value)}
               required
+              disabled={loading}
             ></input>
           </div>
 
-          <button type="submit">Iniciar sesión</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+          </button>
         </form>
 
         <div className={styles.crea}>
