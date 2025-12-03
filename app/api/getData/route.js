@@ -18,7 +18,7 @@ export async function GET(request) {
     const token = authHeader.replace("Bearer ", "");
 
     // Hacer la consulta al API externo desde el servidor (sin problemas de CORS)
-    const response = await fetch(dev_api + "/usuariounrc/getData", {
+    const response = await fetch(prod_api + "/usuariounrc/getData", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
