@@ -1,13 +1,67 @@
+const prod_api = "https://api-comunidada-unrc.wikirp.dev";
+const dev_api = "http://localhost";
+
+const api = dev_api;
+
+export async function login(user) {
+  // Obtener el token de Firebase
+
+  return {
+    firstTime: true,
+  };
+  const token = await user.getIdToken();
+
+  const dir = api + "/api/login";
+
+  const response = await fetch(dir, {
+    method: "GET",
+    headers: {
+      "auth-token": token,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const raw = await response.json();
+
+  console.log(raw.data);
+}
+
+export async function registro(user, correo) {
+  // Obtener el token de Firebase
+
+  return {
+    firstTime: true,
+  };
+  const dir = api + "/registro";
+
+  const response = await fetch(dir, {
+    method: "GET",
+    headers: {
+      user: user,
+      mail: correo,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const raw = await response.json();
+
+  console.log(raw.data);
+}
+
 export async function getUserData(user) {
+  return {
+    firstTime: true,
+  };
   try {
     // Obtener el token de Firebase
     const token = await user.getIdToken();
 
+    const dir = api + "/registro";
     // Hacer la consulta a la API route local (que actúa como proxy)
-    const response = await fetch("/api/getData", {
+    const response = await fetch(dir, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        "auth-token": token,
         "Content-Type": "application/json",
       },
     });
@@ -21,9 +75,8 @@ export async function getUserData(user) {
     }
 
     const raw = await response.json();
-    const data = JSON.parse(raw);
-   
-    return data;
+
+    return raw;
   } catch (error) {
     console.error("Error al consultar el API:", error);
     throw error;

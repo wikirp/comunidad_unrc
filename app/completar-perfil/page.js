@@ -97,7 +97,7 @@ const page = () => {
   return (
     <main className={styles.contenedor}>
       <Link href={"/"} className={styles.titulo}>
-        CASTEMONES
+        Kalli Colectivo
       </Link>
 
       <form className={styles.formulario} onSubmit={handleSubmit}>
@@ -106,8 +106,6 @@ const page = () => {
           Para que puedas continuar con la asignación de tu personaje, completa
           la siguiente información
         </p>
-
-        {error && <div className={styles.error}>{error}</div>}
 
         <div className={styles.field}>
           <label htmlFor="nombre">Nombre</label>

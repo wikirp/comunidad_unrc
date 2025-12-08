@@ -26,7 +26,7 @@ const NoticiasDeNosotrosProntoPage = () => {
           textDecoration: "none",
         }}
       >
-        CASTEMONES
+        Kalli Colectivof
       </Link>
 
       <h1 style={{ fontSize: "1.8rem", marginBottom: "0.75rem" }}>

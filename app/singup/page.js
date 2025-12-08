@@ -1,26 +1,23 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   setPersistence,
   createUserWithEmailAndPassword,
-  browserLocalPersistence
+  browserLocalPersistence,
 } from "firebase/auth";
 import { auth } from "@/configs/firebaseConf";
 import { useAuth } from "@/hooks/useAuth";
 
 import styles from "./singup.module.scss";
-import Link from "next/link";
+import { registro } from "@/utils/api";
 
 const page = () => {
   const router = useRouter();
   const { user, loading: authLoading, userData, loadingUserData } = useAuth();
 
   const [correo, setCorreo] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [usrname, setUsrname] = useState("");
-  const [semestre, setSemestre] = useState("");
-  const [carrera, setCarrera] = useState("");
   const [passwd, setPasswd] = useState("");
   const [confirmPasswd, setConfirmPasswd] = useState("");
   const [error, setError] = useState("");
@@ -65,8 +62,19 @@ const page = () => {
     }
 
     try {
-      await setPersistence(auth, browserLocalPersistence)
-      await createUserWithEmailAndPassword(auth, correo, passwd);
+      await setPersistence(auth, browserLocalPersistence);
+      createUserWithEmailAndPassword(auth, correo, passwd).then(
+        (userCredential) => {
+          // Éxito:
+          const user = userCredential.user;
+
+          // Obtener el UID del usuario
+          console.log("UID del nuevo usuario:", user.uid);
+
+          // Aqui empuja los datos a mongo
+          registro(user.uid, correo);
+        }
+      );
       // La redirección se manejará automáticamente en el useEffect cuando userData esté disponible
     } catch (error) {
       console.error(error);
@@ -94,15 +102,15 @@ const page = () => {
   return (
     <main className={styles.contenedor}>
       <Link href={"/"} className={styles.titulo}>
-        CASTEMONES
+        Nombre del proyectos
       </Link>
 
       <div>
         <form className={styles.formulario} onSubmit={handleSubmit}>
           <h2>Crea tu cuenta</h2>
-          
+
           {error && <div className={styles.error}>{error}</div>}
-          
+
           <div className={styles.field}>
             <label htmlFor="correo">Correo electronico</label>
             <input

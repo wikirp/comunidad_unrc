@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/configs/firebaseConf";
-import { getUserData } from "@/utils/api";
+import { getUserData, login } from "@/utils/api";
 
 const AuthContext = createContext({});
 
@@ -22,7 +22,9 @@ export const AuthContextProvider = ({ children }) => {
         // Cargar datos del usuario desde el API
         setLoadingUserData(true);
         try {
-          const data = await getUserData(currentUser);
+          const data = await login(currentUser);
+
+          console.log(data);
           setUserData(data);
         } catch (error) {
           console.error("Error al cargar datos del usuario:", error);
@@ -45,7 +47,7 @@ export const AuthContextProvider = ({ children }) => {
     if (user) {
       setLoadingUserData(true);
       try {
-        const data = await getUserData(user);
+        const data = await login(user);
         setUserData(data);
         return data;
       } catch (error) {

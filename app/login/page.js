@@ -78,7 +78,7 @@ const page = () => {
   return (
     <main className={styles.contenedor}>
       <Link href={"/"} className={styles.titulo}>
-        CASTEMONES
+        Kalli Colectivo
       </Link>
 
       <div>

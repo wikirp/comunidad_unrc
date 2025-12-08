@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 const prod_api = "https://api-comunidada-unrc.wikirp.dev";
 const dev_api = "http://localhost:8000";
 
+const api = dev_api;
 export async function GET(request) {
   try {
     // Obtener el token del header Authorization
@@ -18,7 +19,7 @@ export async function GET(request) {
     const token = authHeader.replace("Bearer ", "");
 
     // Hacer la consulta al API externo desde el servidor (sin problemas de CORS)
-    const response = await fetch(prod_api + "/usuariounrc/getData", {
+    const response = await fetch(api + "/api/login", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
