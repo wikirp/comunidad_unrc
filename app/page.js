@@ -9,7 +9,10 @@ export default function Home() {
           <h1 className={styles.texto}>Bienvenido colega</h1>
         </div>
 
-        <div className={styles.textos}>En esta plataforma encontrarás</div>
+        <div className={styles.textos}>
+          En esta plataforma encontrarás una comunidad con la que puedes
+          compartir tus intereses para poder crecer personal y profesional.
+        </div>
 
         <Link href={"/panel"} className={styles.enlace}>
           <h2>Ir a </h2>
