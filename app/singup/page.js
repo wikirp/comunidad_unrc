@@ -102,7 +102,7 @@ const page = () => {
   return (
     <main className={styles.contenedor}>
       <Link href={"/"} className={styles.titulo}>
-        Nombre del proyectos
+        Kalli Colectivo
       </Link>
 
       <div>
