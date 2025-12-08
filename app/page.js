@@ -11,15 +11,12 @@ export default function Home() {
 
         <div className={styles.textos}>
           En esta plataforma encontrarás una comunidad con la que puedes
-          compartir tus intereses para poder crecer personal y profesional.
+          compartir tus intereses para poder crecer personal y profesionalmente.
         </div>
 
         <Link href={"/panel"} className={styles.enlace}>
-          <h2>Ir a </h2>
-          <h2 className={styles.castemones}>Kalli Colectivo</h2>
+          <h2>Ir a Kalli Colectivo </h2>
         </Link>
-
-        <div className={styles.textos}>a</div>
       </div>
     </main>
   );
