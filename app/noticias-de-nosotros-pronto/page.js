@@ -11,7 +11,7 @@ const NoticiasDeNosotrosProntoPage = () => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        color: "#fdfffc",
+        color: "#0a0a0a",
         textAlign: "center",
         padding: "1.5rem",
       }}
@@ -26,7 +26,7 @@ const NoticiasDeNosotrosProntoPage = () => {
           textDecoration: "none",
         }}
       >
-        Kalli Colectivof
+        Kalli Colectivo
       </Link>
 
       <h1 style={{ fontSize: "1.8rem", marginBottom: "0.75rem" }}>
@@ -41,6 +41,3 @@ const NoticiasDeNosotrosProntoPage = () => {
 };
 
 export default NoticiasDeNosotrosProntoPage;
-
-
-

@@ -129,7 +129,13 @@ const page = () => {
           <></>
         )}
 
-        <button onClick={() => setStep(step + 1)}>Siguiente</button>
+        {step === 1 ? (
+          <Link href="/noticias-de-nosotros-pronto">
+            <button>Siguiente</button>
+          </Link>
+        ) : (
+          <button onClick={() => setStep(step + 1)}>Siguiente</button>
+        )}
 
         {/* <button type="submit" disabled={loading}>
           {loading ? "Guardando..." : "Completar perfil"}
@@ -159,6 +165,7 @@ const Step1 = () => {
     </div>
   );
 };
+
 const Step2 = ({ tipo }) => {
   const [nombre, setNombre] = useState("");
   const [carrera, setCarrera] = useState("");
