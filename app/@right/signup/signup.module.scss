@@ -1,0 +1,211 @@
+$lcd-bg: #0b2216;
+$neon-green: #55efc4;
+$neon-dim: #2ecc71;
+$neon-dark: #05130b;
+$text-light: #f1f2f6;
+$error-red: #ff7675;
+
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: monospace;
+  color: $neon-green;
+  gap: 0.5rem;
+}
+
+.terminalHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 2px dashed rgba(85, 239, 196, 0.35);
+  padding-bottom: 0.4rem;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: $neon-green;
+    text-shadow: 0 0 6px rgba(85, 239, 196, 0.5);
+  }
+}
+
+.terminalDot {
+  width: 8px;
+  height: 8px;
+  background-color: $neon-green;
+  border-radius: 50%;
+  box-shadow: 0 0 8px $neon-green;
+}
+
+.centralBlock {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  flex: 1;
+  gap: 0.45rem;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: monospace;
+}
+
+.blinkingPrompt {
+  color: $neon-green;
+  font-size: 0.85rem;
+  font-weight: bold;
+  animation: blink 1s infinite alternate;
+}
+
+@keyframes blink {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+.errorBanner {
+  background-color: rgba(255, 118, 117, 0.15);
+  border: 1px solid $error-red;
+  color: $error-red;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  label {
+    font-size: 0.65rem;
+    color: $text-light;
+    font-weight: 600;
+  }
+
+  input {
+    background-color: $neon-dark;
+    border: 2px solid $neon-dim;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 0.8rem;
+    padding: 5px 8px;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(85, 239, 196, 0.35);
+    }
+
+    &:focus {
+      border-color: $neon-green;
+      box-shadow: 0 0 6px rgba(85, 239, 196, 0.5);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.submitBtn {
+  background-color: $neon-green;
+  color: #05130b;
+  border: 2px solid #1c1c1c;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 0px #1b8a6b;
+  margin-top: 2px;
+
+  &:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0px #1b8a6b;
+  }
+
+  &:disabled {
+    background-color: #2c5344;
+    color: #8fa89b;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.dividerRow {
+  text-align: center;
+  font-size: 0.62rem;
+  color: rgba(85, 239, 196, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.socialButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.socialBtn {
+  background-color: #0d1e16;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.72rem;
+  padding: 6px 4px;
+  cursor: pointer;
+  border: 2px solid #1c1c1c;
+  transition: transform 0.05s ease;
+
+  &:active:not(:disabled) {
+    transform: translateY(2px);
+  }
+}
+
+.btnGoogle {
+  color: #f5f6fa;
+  border-color: #ea4335;
+  box-shadow: 0 2px 0px #900c3f;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(234, 67, 53, 0.15);
+  }
+}
+
+.footerLink {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 0.4rem;
+  border-top: 1px dashed rgba(85, 239, 196, 0.25);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+
+  span {
+    color: rgba(241, 242, 246, 0.65);
+  }
+
+  .enlace {
+    color: $neon-green;
+    text-decoration: none;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

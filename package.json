@@ -9,11 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "firebase": "^12.6.0",
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "sass": "^1.94.0"
+    "react-hook-form": "^7.71.1",
+    "sass": "^1.94.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "eslint": "^9",

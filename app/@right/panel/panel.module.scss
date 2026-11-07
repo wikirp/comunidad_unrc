@@ -1,0 +1,108 @@
+$neon-green: #55efc4;
+$neon-dim: #2ecc71;
+$neon-dark: #05130b;
+$text-light: #f1f2f6;
+
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: monospace;
+  color: $neon-green;
+  gap: 0.75rem;
+}
+
+.terminalHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 2px dashed rgba(85, 239, 196, 0.35);
+  padding-bottom: 0.4rem;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: $neon-green;
+    text-shadow: 0 0 6px rgba(85, 239, 196, 0.5);
+  }
+}
+
+.terminalDot {
+  width: 8px;
+  height: 8px;
+  background-color: $neon-green;
+  border-radius: 50%;
+  box-shadow: 0 0 8px $neon-green;
+}
+
+.centralBlock {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+  gap: 0.6rem;
+  overflow-y: auto;
+}
+
+.dataCard {
+  background-color: $neon-dark;
+  border: 1px solid rgba(85, 239, 196, 0.4);
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dataRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  border-bottom: 1px dotted rgba(85, 239, 196, 0.2);
+  padding-bottom: 0.25rem;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .label {
+    color: rgba(241, 242, 246, 0.7);
+  }
+
+  .value {
+    color: $text-light;
+    font-weight: bold;
+    text-align: right;
+  }
+}
+
+.footerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(85, 239, 196, 0.25);
+}
+
+.logoutBtn {
+  background-color: #0d1e16;
+  color: #ff7675;
+  border: 2px solid #ff7675;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.75rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  letter-spacing: 1px;
+
+  &:hover {
+    background-color: rgba(255, 118, 117, 0.15);
+  }
+}
+

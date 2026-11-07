@@ -5,37 +5,120 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading, userData, loadingUserData } = useAuth();
+  const {
+    user,
+    loading,
+    userData,
+    loadingUserData,
+    profileStatus,
+    authError,
+    refreshUserData,
+    logout,
+  } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // Si ya terminó de cargar auth y NO hay usuario, patada al login
     if (!loading && !user) {
       router.push("/login");
       return;
     }
 
-    // Si hay usuario pero todavía estamos cargando los datos del API, esperamos
     if (!loading && user && loadingUserData) {
       return;
     }
 
-    // Si hay usuario y los datos del API indican firstTime=true,
-    // redirigimos a la página para completar el perfil
-    if (!loading && user && userData && userData.firstTime === true) {
+    if (
+      !loading &&
+      !loadingUserData &&
+      user &&
+      (profileStatus === "incomplete" || userData?.firstTime === true)
+    ) {
       router.push("/completar-perfil");
-      return;
     }
-  }, [user, loading, userData, loadingUserData, router]);
+  }, [user, loading, userData, loadingUserData, profileStatus, router]);
 
-  // Mientras carga auth, no hay usuario, o estamos procesando la redirección,
-  // no mostramos nada (evitamos parpadeos del panel)
-  if (loading || !user || loadingUserData || (userData && userData.firstTime === true)) {
-    return null; // O un componente <Spinner />
+  if (loading || loadingUserData) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          fontFamily: "monospace",
+          color: "#55efc4",
+          fontSize: "0.85rem",
+          fontWeight: "bold",
+        }}
+      >
+        <span>&gt; VERIFICANDO SESIÓN...</span>
+      </div>
+    );
   }
 
-  // Si hay usuario y no es firstTime, renderizamos el contenido protegido (el Dashboard)
+  if (!user || profileStatus === "incomplete" || userData?.firstTime === true) {
+    return null;
+  }
+
+  if (profileStatus === "error") {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: "0.75rem",
+          height: "100%",
+          fontFamily: "monospace",
+          color: "#55efc4",
+        }}
+      >
+        <div
+          style={{
+            border: "1px solid #ff7675",
+            color: "#ff7675",
+            padding: "6px 8px",
+            fontSize: "0.75rem",
+          }}
+        >
+          [!] {authError || "ERROR AL CARGAR PERFIL"}
+        </div>
+        <button
+          type="button"
+          onClick={() => refreshUserData()}
+          style={{
+            backgroundColor: "#55efc4",
+            color: "#05130b",
+            border: "2px solid #1c1c1c",
+            fontFamily: "monospace",
+            fontWeight: "bold",
+            padding: "6px 10px",
+            cursor: "pointer",
+          }}
+        >
+          [ REINTENTAR ]
+        </button>
+        <button
+          type="button"
+          onClick={() => logout()}
+          style={{
+            backgroundColor: "#0d1e16",
+            color: "#55efc4",
+            border: "2px solid #2ecc71",
+            fontFamily: "monospace",
+            fontWeight: "bold",
+            padding: "6px 10px",
+            cursor: "pointer",
+          }}
+        >
+          &gt; CERRAR SESIÓN
+        </button>
+      </div>
+    );
+  }
+
   return <>{children}</>;
 };
 
 export default ProtectedRoute;
+

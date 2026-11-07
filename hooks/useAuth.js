@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/configs/firebaseConf";
-import { getUserData, login } from "@/utils/api";
+import { login } from "@/utils/api";
 
 const AuthContext = createContext({});
 
@@ -14,50 +14,67 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [loadingUserData, setLoadingUserData] = useState(false);
+  // "idle" | "loading" | "complete" | "incomplete" | "error"
+  const [profileStatus, setProfileStatus] = useState("idle");
+  const [authError, setAuthError] = useState(null);
+
+  const verifyProfile = useCallback(async (currentUser) => {
+    if (!currentUser) return null;
+
+    setLoadingUserData(true);
+    setProfileStatus("loading");
+    setAuthError(null);
+
+    try {
+      const data = await login(currentUser);
+      setUserData(data);
+      setProfileStatus(data.firstTime ? "incomplete" : "complete");
+      return data;
+    } catch (error) {
+      console.error("Error al verificar perfil del usuario:", error);
+      setUserData(null);
+      setProfileStatus("error");
+      setAuthError(
+        error.message || "NO SE PUDO VERIFICAR EL PERFIL CON EL SERVIDOR"
+      );
+      return null;
+    } finally {
+      setLoadingUserData(false);
+    }
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        // Cargar datos del usuario desde el API
-        setLoadingUserData(true);
-        try {
-          const data = await login(currentUser);
-
-          console.log(data);
-          setUserData(data);
-        } catch (error) {
-          console.error("Error al cargar datos del usuario:", error);
-          setUserData(null);
-        } finally {
-          setLoadingUserData(false);
-        }
+        await verifyProfile(currentUser);
       } else {
         setUser(null);
         setUserData(null);
+        setProfileStatus("idle");
+        setAuthError(null);
+        setLoadingUserData(false);
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [verifyProfile]);
 
-  // Función para refrescar los datos del usuario
-  const refreshUserData = async () => {
+  const refreshUserData = useCallback(async () => {
     if (user) {
-      setLoadingUserData(true);
-      try {
-        const data = await login(user);
-        setUserData(data);
-        return data;
-      } catch (error) {
-        console.error("Error al refrescar datos del usuario:", error);
-        throw error;
-      } finally {
-        setLoadingUserData(false);
-      }
+      return await verifyProfile(user);
     }
-  };
+    return null;
+  }, [user, verifyProfile]);
+
+  const logout = useCallback(async () => {
+    await signOut(auth);
+    setUser(null);
+    setUserData(null);
+    setProfileStatus("idle");
+    setAuthError(null);
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -66,10 +83,14 @@ export const AuthContextProvider = ({ children }) => {
         loading,
         userData,
         loadingUserData,
+        profileStatus,
+        authError,
         refreshUserData,
+        logout,
       }}
     >
-      {loading ? <div>Cargando ...</div> : children}
+      {children}
     </AuthContext.Provider>
   );
 };
+

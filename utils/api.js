@@ -1,38 +1,58 @@
-const prod_api = "https://api-comunidada-unrc.wikirp.dev";
-const dev_api = "http://localhost";
+// Cambia esta variable para apuntar a otro entorno o dominio fácilmente
+export const API_BASE_URL = "http://localhost:8000/usuariounrc";
+export const LOGIN_ENDPOINT = `${API_BASE_URL}/login`;
 
-const api = dev_api;
-
+/**
+ * Verifica en el backend si el usuario ya tiene su perfil completo.
+ * - HTTP 200: Perfil completo -> devuelve los datos del perfil y firstTime: false
+ * - HTTP 403: Perfil incompleto -> devuelve firstTime: true para redirigir a /completar-perfil
+ */
 export async function login(user) {
-  // Obtener el token de Firebase
-
-  return {
-    firstTime: true,
-  };
   const token = await user.getIdToken();
 
-  const dir = api + "/api/login";
-
-  const response = await fetch(dir, {
+  const response = await fetch(LOGIN_ENDPOINT, {
     method: "GET",
     headers: {
+      Authorization: `Bearer ${token}`,
       "auth-token": token,
       "Content-Type": "application/json",
     },
   });
 
-  const raw = await response.json();
+  if (response.status === 200) {
+    const raw = await response.json().catch(() => ({}));
+    const profileData = raw?.data ?? raw;
 
-  console.log(raw.data);
+    return {
+      ...(typeof profileData === "object" && profileData !== null
+        ? profileData
+        : {}),
+      profile: profileData,
+      firstTime: false,
+      status: 200,
+    };
+  }
+
+  if (response.status === 403) {
+    return {
+      profile: null,
+      firstTime: true,
+      status: 403,
+    };
+  }
+
+  const errorData = await response.json().catch(() => ({}));
+  const error = new Error(
+    errorData.error ||
+      errorData.message ||
+      `Error al verificar perfil (${response.status})`
+  );
+  error.status = response.status;
+  throw error;
 }
 
 export async function registro(user, correo) {
-  // Obtener el token de Firebase
-
-  return {
-    firstTime: true,
-  };
-  const dir = api + "/registro";
+  const dir = `${API_BASE_URL}/registro`;
 
   const response = await fetch(dir, {
     method: "GET",
@@ -43,44 +63,12 @@ export async function registro(user, correo) {
     },
   });
 
-  const raw = await response.json();
-
-  console.log(raw.data);
+  const raw = await response.json().catch(() => ({}));
+  return raw;
 }
 
 export async function getUserData(user) {
-  return {
-    firstTime: true,
-  };
-  try {
-    // Obtener el token de Firebase
-    const token = await user.getIdToken();
-
-    const dir = api + "/registro";
-    // Hacer la consulta a la API route local (que actúa como proxy)
-    const response = await fetch(dir, {
-      method: "GET",
-      headers: {
-        "auth-token": token,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error ||
-          `Error en la respuesta del servidor: ${response.status}`
-      );
-    }
-
-    const raw = await response.json();
-
-    return raw;
-  } catch (error) {
-    console.error("Error al consultar el API:", error);
-    throw error;
-  }
+  return login(user);
 }
 
 /**
@@ -91,14 +79,13 @@ export async function getUserData(user) {
  */
 export async function updateUserData(user, userData) {
   try {
-    // Obtener el token de Firebase
     const token = await user.getIdToken();
 
-    // Hacer la consulta a la API route local (que actúa como proxy)
-    const response = await fetch("/api/updateData", {
+    const response = await fetch(`${API_BASE_URL}/updateData`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+        "auth-token": token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
@@ -119,3 +106,4 @@ export async function updateUserData(user, userData) {
     throw error;
   }
 }
+
