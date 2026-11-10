@@ -1,5 +1,5 @@
 // Cambia esta variable para apuntar a otro entorno o dominio fácilmente
-export const API_BASE_URL = "https://castemonesback.triforma.mx";
+export const API_BASE_URL = "https://castemonesback.triforma.mx/usuariounrc";
 export const LOGIN_ENDPOINT = `${API_BASE_URL}/login`;
 
 /**
