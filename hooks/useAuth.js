@@ -7,6 +7,18 @@ import { login } from "@/utils/api";
 
 const AuthContext = createContext({});
 
+export const PROFILE_DRAFT_STORAGE_KEY = "castemon_completar_perfil_draft";
+
+export const clearProfileDraft = () => {
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.removeItem(PROFILE_DRAFT_STORAGE_KEY);
+    } catch (e) {
+      console.error("Error al limpiar borrador de perfil:", e);
+    }
+  }
+};
+
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthContextProvider = ({ children }) => {
@@ -49,6 +61,7 @@ export const AuthContextProvider = ({ children }) => {
         setUser(currentUser);
         await verifyProfile(currentUser);
       } else {
+        clearProfileDraft();
         setUser(null);
         setUserData(null);
         setProfileStatus("idle");
@@ -69,6 +82,7 @@ export const AuthContextProvider = ({ children }) => {
   }, [user, verifyProfile]);
 
   const logout = useCallback(async () => {
+    clearProfileDraft();
     await signOut(auth);
     setUser(null);
     setUserData(null);

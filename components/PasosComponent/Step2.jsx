@@ -1,39 +1,58 @@
 import { useFormContext } from "react-hook-form";
-
 import styles from "./step.module.scss";
 
-const Step1 = ({ onNext, loading, onPrev }) => {
+const Step2 = ({ onNext, loading, onPrev }) => {
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
   return (
-    <div>
-      <div className={styles.field}>
-        <label>Tipo de usuario</label>
-        <select title="Tipos de usuario" {...register("rol")}>
-          <option value={0}>Seleccionar</option>
-          <option value={"estudiante"}>Estudiantes</option>
-          <option value={"profesor"}>Docentes</option>
-          <option value={"profesional"}>Profesionistas</option>
-          <option value={"curioso"}>Curioso</option>
-        </select>
-        {errors.tipo && <p style={{ color: "red" }}>{errors.tipo.message}</p>}
+    <div className={styles.stepContainer}>
+      <div className={styles.fieldsGroup}>
+        <div className={styles.field}>
+          <label htmlFor="rol">TIPO DE USUARIO</label>
+          <select
+            id="rol"
+            title="Tipos de usuario"
+            {...register("rol")}
+            disabled={loading}
+            defaultValue=""
+          >
+            <option value="" disabled>
+              -- SELECCIONAR --
+            </option>
+            <option value="estudiante">ESTUDIANTE</option>
+            <option value="profesor">DOCENTE</option>
+            <option value="profesional">PROFESIONISTA</option>
+            <option value="curioso">CURIOSO</option>
+          </select>
+          {errors.rol && (
+            <p className={styles.fieldError}>[!] {errors.rol.message}</p>
+          )}
+        </div>
       </div>
 
-      {loading ? (
-        <span className={styles.loader}></span>
-      ) : (
-        <div className={styles.botones}>
-          <button onClick={onPrev}>Anterior</button>
-          <button onClick={onNext} className={styles.siguiente}>
-            Siguente
-          </button>
-        </div>
-      )}
+      <div className={styles.botones}>
+        <button
+          type="button"
+          onClick={onPrev}
+          className={styles.anterior}
+          disabled={loading}
+        >
+          &lt; ATRÁS
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          className={styles.siguiente}
+          disabled={loading}
+        >
+          {loading ? "VALIDANDO..." : "[ SIGUIENTE > ]"}
+        </button>
+      </div>
     </div>
   );
 };
 
-export default Step1;
+export default Step2;
