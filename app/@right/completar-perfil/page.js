@@ -85,6 +85,7 @@ const CompletarPerfilPage = () => {
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [incubatingStage, setIncubatingStage] = useState(0);
   const [draftHydrated, setDraftHydrated] = useState(false);
   const scrollRef = useRef(null);
 
@@ -157,7 +158,7 @@ const CompletarPerfilPage = () => {
           uid: user.uid,
           step,
           values: watchedValues,
-        })
+        }),
       );
     } catch (e) {
       console.error("Error al guardar borrador:", e);
@@ -186,6 +187,20 @@ const CompletarPerfilPage = () => {
     }
   }, [step]);
 
+  useEffect(() => {
+    if (!loading) {
+      setIncubatingStage(0);
+      return;
+    }
+
+    const t1 = setTimeout(() => setIncubatingStage(1), 1800);
+    const t2 = setTimeout(() => setIncubatingStage(2), 4000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [loading]);
+
   if (authLoading || loadingUserData) {
     return (
       <div className={styles.loadingContainer}>
@@ -196,6 +211,50 @@ const CompletarPerfilPage = () => {
 
   if (!user) {
     return null;
+  }
+
+  if (loading) {
+    return (
+      <main className={styles.incubatingScreen}>
+        <header className={styles.terminalHeader}>
+          <div className={styles.headerTopRow}>
+            <div className={styles.headerTitleGroup}>
+              <span className={styles.terminalDot} />
+              <h2>&gt; GENERANDO CASTEMON</h2>
+            </div>
+            <span className={styles.stepBadge}>PROCESANDO</span>
+          </div>
+        </header>
+
+        <div className={styles.incubatingBody}>
+          <div className={styles.indeterminateBar} />
+
+          <div className={styles.terminalLogs}>
+            <p className={incubatingStage === 0 ? styles.activeLog : ""}>
+              &gt; ENVIANDO DATOS DE PERFIL AL SERVIDOR... [OK]
+            </p>
+            {incubatingStage >= 1 && (
+              <p className={incubatingStage === 1 ? styles.activeLog : ""}>
+                &gt; ANALIZANDO AFINIDADES Y PERSONALIDAD... [OK]
+              </p>
+            )}
+            {incubatingStage >= 2 && (
+              <p className={styles.activeLog}>
+                &gt; SINTETIZANDO IMAGEN DE TU CASTEMON...
+              </p>
+            )}
+          </div>
+
+          <div className={styles.promptBlink}>
+            <span>INCUBANDO CRIATURA, ESPERA UNOS SEGUNDOS... ▼</span>
+          </div>
+        </div>
+
+        <footer className={styles.footerLink}>
+          <span>NO CIERRES NI RECARGUES ESTA VENTANA</span>
+        </footer>
+      </main>
+    );
   }
 
   const siguiente = async () => {
@@ -221,7 +280,8 @@ const CompletarPerfilPage = () => {
   };
 
   const handleFinalSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (step !== TOTAL_STEPS) return;
     setError("");
 
     const currentFields = Object.keys(STEP_SCHEMAS[step].shape);
@@ -235,38 +295,26 @@ const CompletarPerfilPage = () => {
     try {
       const allValues = getValues();
 
-      const respuestasPersonalidad = {};
+      // Construir el array ordenado de 32 respuestas
+      const respuestas = [];
       for (let i = 1; i <= 32; i++) {
-        respuestasPersonalidad[`p${i}`] = allValues[`p${i}`];
+        respuestas.push(allValues[`p${i}`]);
       }
 
       const payload = {
-        datosBasicos: {
-          username: allValues.username?.trim(),
-          edad: Number(allValues.edad),
-          genero: allValues.genero,
-          lgbt: allValues.lgbt,
-        },
-        datosUniversidad: {
-          carrera: allValues.carrera,
-          sede: allValues.sede,
-          semestre: Number(allValues.semestre),
-        },
-        cuestionarioPersonalidad: respuestasPersonalidad,
-        // Campos planos por compatibilidad con el backend
         username: allValues.username?.trim(),
         edad: Number(allValues.edad),
         genero: allValues.genero,
         lgbt: allValues.lgbt,
-        carrera: allValues.carrera,
-        sede: allValues.sede,
-        semestre: String(allValues.semestre),
-        ...respuestasPersonalidad,
+        carrera: allValues.carrera?.trim(),
+        sede: allValues.sede?.trim(),
+        semestre: String(allValues.semestre).trim(),
+        respuestas, // [allValues.p1, allValues.p2, ..., allValues.p32]
       };
 
-      await updateUserData(user, payload);
+      const responseData = await updateUserData(user, payload);
       clearProfileDraft();
-      await refreshUserData();
+      await refreshUserData(responseData);
       router.push("/panel");
     } catch (err) {
       console.error("Error al guardar el perfil:", err);
@@ -349,7 +397,7 @@ const CompletarPerfilPage = () => {
       )}
 
       {/* Formulario por bloques */}
-      <form className={styles.formulario} onSubmit={handleFinalSubmit}>
+      <form className={styles.formulario} onSubmit={(e) => e.preventDefault()}>
         <div className={styles.scrollArea} ref={scrollRef}>
           {/* PASO 1: INTRODUCCIÓN A LA INCUBACIÓN DEL CASTEMON */}
           {step === 1 && (
@@ -383,9 +431,7 @@ const CompletarPerfilPage = () => {
           {step === 2 && (
             <>
               <div className={styles.field}>
-                <label htmlFor="username">
-                  1. Nombre de usuario:
-                </label>
+                <label htmlFor="username">1. Nombre de usuario:</label>
                 <input
                   id="username"
                   type="text"
@@ -525,6 +571,7 @@ const CompletarPerfilPage = () => {
 
           {step < TOTAL_STEPS ? (
             <button
+              key="btn-siguiente"
               type="button"
               onClick={siguiente}
               className={styles.submitBtn}
@@ -534,7 +581,9 @@ const CompletarPerfilPage = () => {
             </button>
           ) : (
             <button
-              type="submit"
+              key="btn-finalizar"
+              type="button"
+              onClick={handleFinalSubmit}
               className={styles.submitBtn}
               disabled={loading}
             >

@@ -11,7 +11,6 @@ import {
 } from "firebase/auth";
 import { auth } from "@/configs/firebaseConf";
 import { useAuth } from "@/hooks/useAuth";
-import { registro } from "@/utils/api";
 
 import styles from "./signup.module.scss";
 

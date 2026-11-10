@@ -74,12 +74,50 @@ export const AuthContextProvider = ({ children }) => {
     return () => unsubscribe();
   }, [verifyProfile]);
 
-  const refreshUserData = useCallback(async () => {
-    if (user) {
-      return await verifyProfile(user);
-    }
-    return null;
-  }, [user, verifyProfile]);
+  const refreshUserData = useCallback(
+    async (newProfileData = null) => {
+      if (newProfileData && typeof newProfileData === "object") {
+        setUserData((prev) => ({
+          ...(prev || {}),
+          ...newProfileData,
+          profile: {
+            ...(prev?.profile || {}),
+            ...newProfileData,
+          },
+          firstTime: false,
+          status: 200,
+        }));
+        setProfileStatus("complete");
+      }
+
+      if (user) {
+        const refreshed = await verifyProfile(user);
+        if (newProfileData && typeof newProfileData === "object" && refreshed) {
+          const merged = {
+            ...newProfileData,
+            ...refreshed,
+            grafico_url:
+              refreshed.grafico_url ||
+              refreshed?.profile?.grafico_url ||
+              newProfileData.grafico_url,
+            profile: {
+              ...newProfileData,
+              ...(refreshed.profile || {}),
+              grafico_url:
+                refreshed?.profile?.grafico_url ||
+                refreshed.grafico_url ||
+                newProfileData.grafico_url,
+            },
+          };
+          setUserData(merged);
+          return merged;
+        }
+        return refreshed;
+      }
+      return null;
+    },
+    [user, verifyProfile]
+  );
 
   const logout = useCallback(async () => {
     clearProfileDraft();

@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 export default function LeftPanelPage() {
   const { user, userData } = useAuth();
   const profile = userData?.profile || userData || {};
+  const graficoUrl =
+    profile?.grafico_url || userData?.grafico_url || profile?.avatar_url || "";
 
   return (
     <ProtectedRoute>
@@ -20,35 +22,49 @@ export default function LeftPanelPage() {
           fontFamily: "monospace",
           color: "#55efc4",
         }}
+      ></div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "0.65rem",
+          margin: "auto 0",
+          textAlign: "center",
+        }}
       >
-        <header
-          style={{
-            fontSize: "0.7rem",
-            letterSpacing: "1.5px",
-            borderBottom: "1px dashed rgba(85, 239, 196, 0.35)",
-            paddingBottom: "0.4rem",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>[ FICHA DE ENTRENADOR ]</span>
-          <span>ONLINE ●</span>
-        </header>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.75rem",
-            margin: "auto 0",
-            textAlign: "center",
-          }}
-        >
+        {graficoUrl ? (
+          <div
+            // style={{
+            //   width: "210px",
+            //   height: "210px",
+            //   border: "2px solid #55efc4",
+            //   borderRadius: "8px",
+            //   padding: "6px",
+            //   display: "flex",
+            //   alignItems: "center",
+            //   justifyContent: "center",
+            //   backgroundColor: "#05130b",
+            //   boxShadow: "0 0 14px rgba(85, 239, 196, 0.35)",
+            //   overflow: "hidden",
+            // }}
+          >
+            <img
+              src={graficoUrl}
+              alt={`Castemon de ${profile?.username || "entrenador"}`}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                imageRendering: "pixelated",
+              }}
+            />
+          </div>
+        ) : (
           <div
             style={{
-              width: "68px",
-              height: "68px",
+              width: "84px",
+              height: "84px",
               borderRadius: "50%",
               border: "2px solid #55efc4",
               display: "flex",
@@ -56,7 +72,7 @@ export default function LeftPanelPage() {
               justifyContent: "center",
               backgroundColor: "#05130b",
               boxShadow: "0 0 10px rgba(85, 239, 196, 0.3)",
-              fontSize: "1.5rem",
+              fontSize: "1.6rem",
               fontWeight: "bold",
             }}
           >
@@ -64,42 +80,7 @@ export default function LeftPanelPage() {
               .charAt(0)
               .toUpperCase()}
           </div>
-
-          <div>
-            <div
-              style={{
-                fontSize: "0.95rem",
-                fontWeight: "bold",
-                color: "#f1f2f6",
-              }}
-            >
-              {profile?.username || profile?.nombre || "ENTRENADOR UNRC"}
-            </div>
-            <div
-              style={{
-                fontSize: "0.7rem",
-                color: "rgba(241, 242, 246, 0.75)",
-                marginTop: "2px",
-              }}
-            >
-              {user?.email}
-            </div>
-          </div>
-
-          {profile?.carrera && (
-            <div
-              style={{
-                fontSize: "0.72rem",
-                border: "1px solid rgba(85, 239, 196, 0.4)",
-                padding: "4px 8px",
-                backgroundColor: "rgba(5, 19, 11, 0.6)",
-              }}
-            >
-              {profile.carrera}
-              {profile?.semestre ? ` · Semestre ${profile.semestre}` : ""}
-            </div>
-          )}
-        </div>
+        )}
 
         <footer
           style={{
@@ -116,4 +97,3 @@ export default function LeftPanelPage() {
     </ProtectedRoute>
   );
 }
-

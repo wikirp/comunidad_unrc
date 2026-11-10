@@ -1,6 +1,7 @@
 // Cambia esta variable para apuntar a otro entorno o dominio fácilmente
 export const API_BASE_URL = "https://castemonesback.triforma.mx/usuariounrc";
 export const LOGIN_ENDPOINT = `${API_BASE_URL}/login`;
+export const UPDATE_PERFIL_ENDPOINT = `${API_BASE_URL}/completar`;
 
 /**
  * Verifica en el backend si el usuario ya tiene su perfil completo.
@@ -81,7 +82,7 @@ export async function updateUserData(user, userData) {
   try {
     const token = await user.getIdToken();
 
-    const response = await fetch(`${API_BASE_URL}/updateData`, {
+    const response = await fetch(UPDATE_PERFIL_ENDPOINT, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -95,11 +96,12 @@ export async function updateUserData(user, userData) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
         errorData.error ||
+          errorData.message ||
           `Error en la respuesta del servidor: ${response.status}`
       );
     }
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     return data;
   } catch (error) {
     console.error("Error al actualizar los datos:", error);
