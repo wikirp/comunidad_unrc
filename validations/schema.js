@@ -145,6 +145,7 @@ export const SEDES_UNRC = [
   { value: "distancia", label: "Modalidad a Distancia" },
   { value: "euzkadi", label: "Euzkadi" },
   { value: "copilco", label: "Copilco" },
+  { value: "naucalpan ", label: "Naucalpan" },
   { value: "milpa alta herrerias", label: "Milpa Alta Herrerías" },
   { value: "milpa alta olimpica", label: "Milpa Alta Olímpica" },
   { value: "comitan", label: "Comitán" },
