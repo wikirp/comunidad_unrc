@@ -138,6 +138,7 @@ export const CARRERAS_UNRC = [
 export const SEDES_UNRC = [
   { value: "azcapotzalco", label: "Azcapotzalco" },
   { value: "coyoacan", label: "Coyoacán" },
+  { value: "chalco", label: "Chalco" },
   { value: "gam", label: "Gustavo A. Madero (GAM)" },
   { value: "justo sierra", label: "Justo Sierra" },
   { value: "magdalena", label: "Magdalena Contreras" },
